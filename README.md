@@ -206,7 +206,7 @@ At this stage all the resources created by scripts and terraform files will be d
 
 # Reasons for Architecture Selection
 
-This section outlines a cost-effective, scalable, and secure three-tier architecture for deploying the said application on AWS using Terraform and a CI/CD pipeline. We'll prioritize EC2 instances over serverless options for greater control and potential cost savings for this specific application.
+This section outlines a cost-effective, scalable, and secure three-tier architecture for deploying the said application on AWS using Terraform and a CI/CD pipeline. We'll prioritize EC2 instances over serverless options for secure, greater control and potential cost savings for this specific application.
 
 ## AWS Infrastructure Provisioning with Terraform:
 
@@ -252,12 +252,7 @@ Deploy directly to EC2 instances from CodeBuild scripts.
 
 Direct deployment from CodeBuild scripts is used, eliminating the need for a separate CD service like CodeDeploy.
 
-2.3 Pipeline Orchestration (Optional):
-
-While not strictly required, consider using AWS CodePipeline for orchestration:
-Trigger pipeline automatically on code pushes.
-
-Additional Considerations:
+## Additional Considerations:
 
 Evaluate the trade-offs between simplicity, control, and visibility when choosing between
 
@@ -265,7 +260,6 @@ Evaluate the trade-offs between simplicity, control, and visibility when choosin
 - direct deployment from CodeBuild and using a separate CD service.
 
 Ensure robust security measures and monitoring are in place.
-Regularly review and update deployment processes to maintain efficiency and security.
 Choose appropriately sized EC2 instances and utilize Auto Scaling to avoid overprovisioning resources.
 Consider Reserved Instances for predictable workloads to further reduce costs.
 Use Spot Instances if available for less critical tasks within the application.
@@ -278,7 +272,6 @@ Benefits of Selected Implementation:
   Cost-effectiveness: With careful planning and optimization, EC2 can be cost-effective for project's expected usage.
 
 - Maturity and familiarity: Existing knowledge and tools for managing EC2 instances facilitate easier setup and maintenance.
-  Conclusion:
 
 This document provides a cost-effective and scalable architecture for deploying project on AWS using Terraform and a CI/CD pipeline. By utilizing EC2 instances with careful sizing and automation, you can achieve efficient resource utilization and optimize costs while still benefiting from the control and flexibility offered by this approach.
 
