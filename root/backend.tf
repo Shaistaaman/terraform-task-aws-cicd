@@ -3,6 +3,7 @@ terraform {
     bucket = "terraform-task-aws-cicd-bucket"
     key    = "backend/terraform-task-aws-cicd.tfstate"
     region = "us-east-1"
-    dynamodb_table = "remote-backend"
+    dynamodb_table = "terraform-remote-backend"
+    profile = "macmini"
   }
 }
