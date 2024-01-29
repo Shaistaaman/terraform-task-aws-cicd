@@ -6,6 +6,12 @@ Demo for the task assigned about 3 tier architecture implementation by terraform
 
 Design a scalable, secure, cost-effective three-tier web application architecture on AWS using Terraform as Infrastructure as Code (IaC). Additionally, provide a high-level CI/CD pipeline design that includes the key stages and tools that would be used for the automated deployment and management of the application infrastructure and code.
 
+### Deliverables
+
+- Describing the architecture of the application along with brief reasoning for your design choices.
+- IaC scripts that can be used to provision and manage the AWS infrastructure.
+- A document detailing the high-level CI/CD pipeline design, including a diagram and a description of each stage and the tools involved.
+
 ### Tasks:
 
 1. AWS Infrastructure Provisioning with IaC:
@@ -152,6 +158,8 @@ Type `yes`, and it will prompt you for approval..
 
 For this task I have selected Github as a source repository and AWS Code Build to build and deploy the architecture.
 
+![CICD](codebuild.png)
+
 ## Github Setup
 
 First of all set a github repository with a README and terraform gitignore file. Then push the code into the repossitory. Make sure the directory structure should look like ![github](github.png)
@@ -166,6 +174,8 @@ $AWS_SECRET_ACCESS_KEY
 $AWS_REGION
 $PROFILE_NAME
 
+![codebuild](codebuild-dilogue.png)
+
 Buildspec.yml file is cicd folder, make sure to write the exact path for this while configuration
 
 ```sh
@@ -173,3 +183,103 @@ cicd/buildspec.yml
 ```
 
 Once created you can run the build from AWS Code Build console or whenever you push your code to the repo, AWS Code Build Webhook will automatically detected the push and run the Code Build routine.
+
+## Code Cleanup
+
+In the end to avoid additional bill you have to clean up the resources created. For that go to apply-terraform.sh file and comment the
+
+```sh
+terraform apply -auto-approve
+```
+
+and uncomment
+
+```sh
+terraform destroy -auto-approve
+```
+
+after that just push the code in github repo rest will be taken care by the scripts.
+
+### Closing Notes
+
+At this stage all the resources created by scripts and terraform files will be deleted except the resources we manually created. So to you have to manually delete the route53 hosted zone, certifate in ACM, Dynamodb table and S3 bucket terraform remote backend state management.
+
+# Reasons for Architecture Selection
+
+This section outlines a cost-effective, scalable, and secure three-tier architecture for deploying the said application on AWS using Terraform and a CI/CD pipeline. We'll prioritize EC2 instances over serverless options for greater control and potential cost savings for this specific application.
+
+## AWS Infrastructure Provisioning with Terraform:
+
+1.1 VPC and Subnets:
+
+Create a VPC with multiple Availability Zones (AZs) for redundancy.
+Define public and private subnets within each AZ for security separation.
+Assign public subnets to the route traffic via NAT, private subnets to the Application Tier (web servers) and private subnets to the Database Tier.
+
+1.2 EC2 Instances:
+
+Use Auto Scaling groups for the Application Tier with on-demand EC2 instances in the public subnets.
+Choose instance types (e.g., t2.small) based on project expected traffic and resource needs.
+Configure Auto Scaling based on CPU utilization or custom metrics for cost-effective scaling.
+Implement Launch Templates for consistent configuration across the instances.
+
+1.3 Database:
+
+Use Amazon RDS for the Database Tier, choosing an appropriate database engine like MySQL or PostgreSQL.
+Utilize RDS Multi-AZ deployments for high availability and database primary secondary options.
+
+1.4 Load Balancers and Route 53:
+
+Utilize an Application Load Balancer (ALB) in the public subnet to distribute traffic across the Application Tier instances.
+Configure the ALB with health checks to ensure only healthy instances receive traffic.
+Set up a Route 53 hosted zone with a record pointing to the ALB's DNS name for external access.
+
+1.5 Additional Resources:
+
+Implement Security Groups to restrict inbound and outbound traffic for each tier.
+
+2. CI/CD Pipeline Design:
+
+2.1 Source Control and Continuous Integration:
+
+Store project's code in a Git repository (e.g., GitHub, external Git).
+Use AWS CodeBuild for CI:
+Connect to the Git repository.
+Build and package the application code.
+Deploy directly to EC2 instances from CodeBuild scripts.
+
+2.2 Continuous Deployment:
+
+Direct deployment from CodeBuild scripts is used, eliminating the need for a separate CD service like CodeDeploy.
+
+2.3 Pipeline Orchestration (Optional):
+
+While not strictly required, consider using AWS CodePipeline for orchestration:
+Trigger pipeline automatically on code pushes.
+
+Additional Considerations:
+
+Evaluate the trade-offs between simplicity, control, and visibility when choosing between
+
+- server and serverless architechtre
+- direct deployment from CodeBuild and using a separate CD service.
+
+Ensure robust security measures and monitoring are in place.
+Regularly review and update deployment processes to maintain efficiency and security.
+Choose appropriately sized EC2 instances and utilize Auto Scaling to avoid overprovisioning resources.
+Consider Reserved Instances for predictable workloads to further reduce costs.
+Use Spot Instances if available for less critical tasks within the application.
+Leverage managed services like RDS for resource optimization and automated maintenance.
+Regularly review and optimize resource allocation based on actual usage.
+
+Benefits of Selected Implementation:
+
+- Control and flexibility: EC2 instances offer greater control over configuration and scaling compared to serverless options.
+  Cost-effectiveness: With careful planning and optimization, EC2 can be cost-effective for project's expected usage.
+
+- Maturity and familiarity: Existing knowledge and tools for managing EC2 instances facilitate easier setup and maintenance.
+  Conclusion:
+
+This document provides a cost-effective and scalable architecture for deploying project on AWS using Terraform and a CI/CD pipeline. By utilizing EC2 instances with careful sizing and automation, you can achieve efficient resource utilization and optimize costs while still benefiting from the control and flexibility offered by this approach.
+
+This is a high-level overview, and specific configurations will depend on project's specific requirements and traffic patterns. Further detailed instructions and code examples can be developed based on this framework for a complete implementation.
